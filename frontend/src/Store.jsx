@@ -2,11 +2,30 @@ import { createContext, useReducer } from 'react';
 
 export const Store = createContext();
 
+const userInfoFromStorage = localStorage.getItem('userInfo');
+let userInfo = null;
+if (userInfoFromStorage) {
+  try {
+    userInfo = JSON.parse(userInfoFromStorage);
+  } catch (error) {
+    console.error('Error parsing userInfo from localStorage:', error);
+  }
+}
+
+const cartItemsFromStorage = localStorage.getItem('cartItems');
+let cartItems = [];
+if (cartItemsFromStorage) {
+  try {
+    cartItems = JSON.parse(cartItemsFromStorage);
+  } catch (error) {
+    console.error('Error parsing cartItems from localStorage:', error);
+  }
+}
+
 const initialState = {
+  userInfo,
   cart: {
-    cartItems: localStorage.getItem('cartItems')
-      ? JSON.parse(localStorage.getItem('cartItems'))
-      : [],
+    cartItems,
   },
 };
 
@@ -32,6 +51,13 @@ function reducer(state, action) {
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
       return { ...state, cart: { ...state.cart, cartItems } };
     }
+    case 'USER_SIGNIN':
+      return { ...state, userInfo: action.payload };
+    case 'USER_SIGNOUT':
+      return {
+        ...state,
+        userInfo: null,
+      };
     default:
       return state;
   }
