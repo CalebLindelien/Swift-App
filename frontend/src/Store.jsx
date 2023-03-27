@@ -18,8 +18,14 @@ if (shippingAddressFromStorage) {
   try {
     shippingAddress = JSON.parse(shippingAddressFromStorage);
   } catch (error) {
-    console.error('Error parsing cartItems from localStorage:', error);
+    console.error('Error parsing shippingAddress from localStorage:', error);
   }
+}
+
+const paymentMethodFromStorage = localStorage.getItem('paymentMethod');
+let paymentMethod = '';
+if (paymentMethodFromStorage) {
+  paymentMethod = paymentMethodFromStorage;
 }
 
 const cartItemsFromStorage = localStorage.getItem('cartItems');
@@ -36,6 +42,7 @@ const initialState = {
   userInfo,
   cart: {
     shippingAddress,
+    paymentMethod,
     cartItems,
   },
 };
@@ -71,6 +78,7 @@ function reducer(state, action) {
         cart: {
           cartItems: [],
           shippingAddress: {},
+          paymentMethod: '',
         },
       };
     case 'SAVE_SHIPPING_ADDRESS':
@@ -80,6 +88,11 @@ function reducer(state, action) {
           ...state.cart,
           shippingAddress: action.payload,
         },
+      };
+    case 'SAVE_PAYMENT_METHOD':
+      return {
+        ...state,
+        cart: { ...state.cart, paymentMethod: action.payload },
       };
     default:
       return state;
