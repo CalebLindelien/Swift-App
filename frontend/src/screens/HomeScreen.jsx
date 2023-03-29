@@ -1,6 +1,5 @@
 import { useEffect, useReducer, useState } from 'react';
 import axios from 'axios';
-import logger from 'use-reducer-logger';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Product from '../components/Product';
@@ -16,14 +15,14 @@ const reducer = (state, action) => {
     case 'FETCH_SUCCESS':
       return { ...state, products: action.payload, loading: false };
     case 'FETCH_FAIL':
-      return { ...state, error: action.payload, loading: false };
+      return { ...state, loading: false, error: action.payload };
     default:
       return state;
   }
 };
 
 function HomeScreen() {
-  const [{ loading, error, products }, dispatch] = useReducer(logger(reducer), {
+  const [{ loading, error, products }, dispatch] = useReducer(reducer, {
     products: [],
     loading: true,
     error: '',
@@ -38,6 +37,7 @@ function HomeScreen() {
       } catch (err) {
         dispatch({ type: 'FETCH_FAIL', payload: err.message });
       }
+
       // setProducts(result.data);
     };
     fetchData();
@@ -66,5 +66,4 @@ function HomeScreen() {
     </div>
   );
 }
-
 export default HomeScreen;
