@@ -47,10 +47,6 @@ const prices = [
     name: '$201 to $1000',
     value: '201-1000',
   },
-  {
-    name: '$1001 to $5000',
-    value: '1001-5000',
-  },
 ];
 
 export const ratings = [
@@ -129,10 +125,12 @@ export default function SearchScreen() {
     const filterRating = filter.rating || rating;
     const filterPrice = filter.price || price;
     const sortOrder = filter.order || order;
-    return `/search?category=${filterCategory}&query=${filterQuery}&price=${filterPrice}&rating=${filterRating}&order=${sortOrder}&page=${filterPage}`;
+    return `${
+      skipPathname ? '' : '/search?'
+    }category=${filterCategory}&query=${filterQuery}&price=${filterPrice}&rating=${filterRating}&order=${sortOrder}&page=${filterPage}`;
   };
   return (
-    <div className="m-4">
+    <div>
       <Helmet>
         <title>Search Products</title>
       </Helmet>
@@ -239,7 +237,6 @@ export default function SearchScreen() {
                 <Col className="text-end">
                   Sort by{' '}
                   <select
-                    className="my-2"
                     value={order}
                     onChange={(e) => {
                       navigate(getFilterUrl({ order: e.target.value }));
