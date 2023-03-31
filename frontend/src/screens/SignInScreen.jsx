@@ -1,15 +1,15 @@
-import { Helmet } from 'react-helmet-async';
 import Axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import { Helmet } from 'react-helmet-async';
 import { useContext, useEffect, useState } from 'react';
 import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import { getError } from '../utils';
 
-function SigninScreen() {
+export default function SigninScreen() {
   const navigate = useNavigate();
   const { search } = useLocation();
   const redirectInUrl = new URLSearchParams(search).get('redirect');
@@ -48,7 +48,7 @@ function SigninScreen() {
       </Helmet>
       <h1 className="my-3">Sign In</h1>
       <Form onSubmit={submitHandler}>
-        <Form.Group className="mb-3" controllid="email">
+        <Form.Group className="mb-3" controlId="email">
           <Form.Label>Email</Form.Label>
           <Form.Control
             type="email"
@@ -56,7 +56,7 @@ function SigninScreen() {
             onChange={(e) => setEmail(e.target.value)}
           />
         </Form.Group>
-        <Form.Group className="mb-3" controllid="password">
+        <Form.Group className="mb-3" controlId="password">
           <Form.Label>Password</Form.Label>
           <Form.Control
             type="password"
@@ -68,12 +68,13 @@ function SigninScreen() {
           <Button type="submit">Sign In</Button>
         </div>
         <div className="mb-3">
-          New Customer?{' '}
+          New customer?{' '}
           <Link to={`/signup?redirect=${redirect}`}>Create your account</Link>
+        </div>
+        <div className="mb-3">
+          Forget Password? <Link to={`/forget-password`}>Reset Password</Link>
         </div>
       </Form>
     </Container>
   );
 }
-
-export default SigninScreen;
