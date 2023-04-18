@@ -13,6 +13,7 @@ import Button from 'react-bootstrap/Button';
 import Product from '../components/Product';
 import LinkContainer from 'react-router-bootstrap/LinkContainer';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -34,6 +35,7 @@ const reducer = (state, action) => {
   }
 };
 
+// This array contains the options for price range filters.
 const prices = [
   {
     name: '$1 to $50',
@@ -49,6 +51,7 @@ const prices = [
   },
 ];
 
+// This array contains the options for rating filters.
 export const ratings = [
   {
     name: '4stars & up',
@@ -74,20 +77,22 @@ export const ratings = [
 export default function SearchScreen() {
   const navigate = useNavigate();
   const { search } = useLocation();
-  const sp = new URLSearchParams(search); // /search?category=Shirts
-  const category = sp.get('category') || 'all';
-  const query = sp.get('query') || 'all';
-  const price = sp.get('price') || 'all';
-  const rating = sp.get('rating') || 'all';
-  const order = sp.get('order') || 'newest';
-  const page = sp.get('page') || 1;
+  const sp = new URLSearchParams(search); // // Parse query string
+  const category = sp.get('category') || 'all'; // Get category from query string, or default to 'all'
+  const query = sp.get('query') || 'all'; // Get search query from query string, or default to 'all'
+  const price = sp.get('price') || 'all'; // Get price range filter from query string, or default to 'all'
+  const rating = sp.get('rating') || 'all'; // Get rating filter from query string, or default to 'all'
+  const order = sp.get('order') || 'newest'; // Get sort order from query string, or default to 'newest'
+  const page = sp.get('page') || 1; // Get page number from query string, or default to 1
 
+  // Use the useReducer hook to manage the loadingUpdate state
   const [{ loading, error, products, pages, countProducts }, dispatch] =
     useReducer(reducer, {
       loading: true,
       error: '',
     });
 
+  // Fetches the search results from the backend API based on the current filters and updates the state accordingly.
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -105,6 +110,7 @@ export default function SearchScreen() {
     fetchData();
   }, [category, error, order, page, price, query, rating]);
 
+  // useEffect to fetch product categories
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     const fetchCategories = async () => {
@@ -118,6 +124,7 @@ export default function SearchScreen() {
     fetchCategories();
   }, [dispatch]);
 
+  // Helper function to generate filter URL
   const getFilterUrl = (filter, skipPathname) => {
     const filterPage = filter.page || page;
     const filterCategory = filter.category || category;
@@ -125,10 +132,13 @@ export default function SearchScreen() {
     const filterRating = filter.rating || rating;
     const filterPrice = filter.price || price;
     const sortOrder = filter.order || order;
+    // Concatenate search filter values to generate filter URL
     return `${
       skipPathname ? '' : '/search?'
     }category=${filterCategory}&query=${filterQuery}&price=${filterPrice}&rating=${filterRating}&order=${sortOrder}&page=${filterPage}`;
   };
+
+  // Render search filter and products
   return (
     <div>
       <Helmet>
@@ -136,6 +146,7 @@ export default function SearchScreen() {
       </Helmet>
       <Row>
         <Col md={3}>
+          {/* Render department filter */}
           <h3>Department</h3>
           <div>
             <ul>
@@ -147,6 +158,7 @@ export default function SearchScreen() {
                   Any
                 </Link>
               </li>
+              {/* Map categories and render filter options */}
               {categories.map((c) => (
                 <li key={c}>
                   <Link
@@ -159,6 +171,7 @@ export default function SearchScreen() {
               ))}
             </ul>
           </div>
+          {/* Render price filter */}
           <div>
             <h3>Price</h3>
             <ul>
@@ -170,6 +183,7 @@ export default function SearchScreen() {
                   Any
                 </Link>
               </li>
+              {/* Map prices and render filter options */}
               {prices.map((p) => (
                 <li key={p.value}>
                   <Link
@@ -182,6 +196,7 @@ export default function SearchScreen() {
               ))}
             </ul>
           </div>
+          {/* Render rating filter */}
           <div>
             <h3>Avg. Customer Review</h3>
             <ul>
@@ -195,6 +210,7 @@ export default function SearchScreen() {
                   </Link>
                 </li>
               ))}
+              {/* create a link with the filter url to show all products */}
               <li>
                 <Link
                   to={getFilterUrl({ rating: 'all' })}
@@ -212,6 +228,7 @@ export default function SearchScreen() {
           ) : error ? (
             <MessageBox variant="danger">{error}</MessageBox>
           ) : (
+            // Display number of products, filters selected, and option to clear filters
             <>
               <Row className="justify-content-between mb-3">
                 <Col md={6}>
@@ -221,6 +238,7 @@ export default function SearchScreen() {
                     {category !== 'all' && ' : ' + category}
                     {price !== 'all' && ' : Price ' + price}
                     {rating !== 'all' && ' : Rating ' + rating + ' & up'}
+                    {/* display the clear filter button if a filter is selected */}
                     {query !== 'all' ||
                     category !== 'all' ||
                     rating !== 'all' ||
@@ -252,7 +270,7 @@ export default function SearchScreen() {
               {products.length === 0 && (
                 <MessageBox>No Product Found</MessageBox>
               )}
-
+              {/* display list of products */}
               <Row>
                 {products.map((product) => (
                   <Col sm={6} lg={4} className="mb-3" key={product._id}>

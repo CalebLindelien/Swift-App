@@ -9,6 +9,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -27,13 +28,16 @@ const reducer = (state, action) => {
 };
 
 export default function DashboardScreen() {
+  // Use useReducer to manage state
   const [{ loading, summary, error }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
   });
+  // Get user info from context
   const { state } = useContext(Store);
   const { userInfo } = state;
 
+  // Fetch summary data from API when user info changes
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -51,6 +55,7 @@ export default function DashboardScreen() {
     fetchData();
   }, [userInfo]);
 
+  // Render dashboard
   return (
     <div>
       <h1>Dashboard</h1>
@@ -60,6 +65,7 @@ export default function DashboardScreen() {
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
         <>
+          {/* Display summary data */}
           <Row>
             <Col md={4}>
               <Card>
@@ -99,6 +105,8 @@ export default function DashboardScreen() {
               </Card>
             </Col>
           </Row>
+
+          {/* Display sales chart */}
           <div className="my-3">
             <h2>Sales</h2>
             {summary.dailyOrders.length === 0 ? (

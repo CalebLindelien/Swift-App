@@ -17,6 +17,7 @@ import { Store } from '../Store';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import { toast } from 'react-toastify';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 const reducer = (state, action) => {
   switch (action.type) {
     case 'REFRESH_PRODUCT':
@@ -38,9 +39,11 @@ const reducer = (state, action) => {
   }
 };
 
+// Component to render product details
 function ProductScreen() {
-  let reviewsRef = useRef();
+  let reviewsRef = useRef(); //reference to reviews section of the page
 
+  // States to hold rating, comment, and selected image
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [selectedImage, setSelectedImage] = useState('');
@@ -49,12 +52,15 @@ function ProductScreen() {
   const params = useParams();
   const { slug } = params;
 
+  // State and reducer function for products
   const [{ loading, error, product, loadingCreateReview }, dispatch] =
     useReducer(reducer, {
       product: [],
       loading: true,
       error: '',
     });
+
+  // Fetch the product from the server
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
@@ -68,9 +74,11 @@ function ProductScreen() {
     fetchData();
   }, [slug]);
 
+  // Accessing the global store and state of cart and user information
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
 
+  // Adding the product to the cart
   const addToCartHandler = async () => {
     const existItem = cart.cartItems.find((x) => x._id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
@@ -86,8 +94,10 @@ function ProductScreen() {
     navigate('/cart');
   };
 
+  // This function is responsible for handling the form submission when a user submits a review
   const submitHandler = async (e) => {
     e.preventDefault();
+    // If the comment or rating are not filled out, show an error message and return
     if (!comment || !rating) {
       toast.error('Please enter comment and rating');
       return;
@@ -109,6 +119,7 @@ function ProductScreen() {
       product.numReviews = data.numReviews;
       product.rating = data.rating;
       dispatch({ type: 'REFRESH_PRODUCT', payload: product });
+      // Scroll the user to the reviews section
       window.scrollTo({
         behavior: 'smooth',
         top: reviewsRef.current.offsetTop,
@@ -124,6 +135,7 @@ function ProductScreen() {
   ) : error ? (
     <MessageBox variant="danger">{error}</MessageBox>
   ) : (
+    // Otherwise, render the product details and reviews
     <div>
       <Row>
         <Col md={6}>

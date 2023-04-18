@@ -12,11 +12,13 @@ import axios from 'axios';
 
 function CartScreen() {
   const navigate = useNavigate();
+  // Retrieve the cart items and dispatch from the global store
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const {
     cart: { cartItems },
   } = state;
 
+  // This function updates the quantity of items in the cart
   const updateCartHandler = async (item, quantity) => {
     const { data } = await axios.get(`/api/products/${item._id}`);
     if (data.countInStock < quantity) {
@@ -29,10 +31,12 @@ function CartScreen() {
     });
   };
 
+  // This function removes an item from the cart
   const removeItemHandler = (item) => {
     ctxDispatch({ type: 'CART_REMOVE_ITEM', payload: item });
   };
 
+  // This function handles checkout
   const checkoutHandler = () => {
     navigate('/signin?redirect=/shipping');
   };
@@ -50,6 +54,7 @@ function CartScreen() {
               Cart is empty. <Link to="/">Go Shopping</Link>
             </MessageBox>
           ) : (
+            // If there are items in the cart, display the items and their information, as well as the quantity
             <ListGroup>
               {cartItems.map((item) => (
                 <ListGroup.Item key={item._id}>

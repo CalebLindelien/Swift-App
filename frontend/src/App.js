@@ -35,19 +35,28 @@ import UserListScreen from './screens/UserListScreen';
 import UserEditScreen from './screens/UserEditScreen';
 
 function App() {
+  // Get the global state and dispatch function from the Store
   const { state, dispatch: ctxDispatch } = useContext(Store);
+  // Destructure properties from the global state
   const { fullBox, cart, userInfo } = state;
 
+  // Handler function for user signout
   const signoutHandler = () => {
+    // Dispatch an action to update the global state
     ctxDispatch({ type: 'USER_SIGNOUT' });
+    // Remove user info from local storage
     localStorage.removeItem('userInfo');
     localStorage.removeItem('shippingAddress');
     localStorage.removeItem('paymentMethod');
+    // Redirect to the signin page
     window.location.href = '/signin';
   };
+  // State and setState for the sidebar open/close status
   const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
+  // State and setState for the categories list
   const [categories, setCategories] = useState([]);
 
+  // Fetch the categories list from the server and update the state
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -59,7 +68,9 @@ function App() {
     };
     fetchCategories();
   }, []);
+
   return (
+    // Use the BrowserRouter component to enable client-side routing
     <BrowserRouter>
       <div
         className={

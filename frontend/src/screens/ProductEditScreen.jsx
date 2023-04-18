@@ -12,6 +12,7 @@ import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
 import Button from 'react-bootstrap/Button';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -45,14 +46,18 @@ export default function ProductEditScreen() {
   const params = useParams(); // /product/:id
   const { id: productId } = params;
 
+  // Get the state and userInfo from the global store using the useContext hook
   const { state } = useContext(Store);
   const { userInfo } = state;
+
+  // Use the useReducer hook to manage the state for the component
   const [{ loading, error, loadingUpdate, loadingUpload }, dispatch] =
     useReducer(reducer, {
       loading: true,
       error: '',
     });
 
+  // Define state variables for each form input field
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [price, setPrice] = useState('');
@@ -63,6 +68,7 @@ export default function ProductEditScreen() {
   const [brand, setBrand] = useState('');
   const [description, setDescription] = useState('');
 
+  // Use the useEffect hook to fetch the product details based on the productId parameter in the URL
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -88,12 +94,13 @@ export default function ProductEditScreen() {
     fetchData();
   }, [productId]);
 
+  // Handler function to update the product details
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      dispatch({ type: 'UPDATE_REQUEST' });
+      dispatch({ type: 'UPDATE_REQUEST' }); // dispatching a request to update the product
       await axios.put(
-        `/api/products/${productId}`,
+        `/api/products/${productId}`, // updating the product using a put request
         {
           _id: productId,
           name,
@@ -120,36 +127,42 @@ export default function ProductEditScreen() {
       dispatch({ type: 'UPDATE_FAIL' });
     }
   };
+
+  // Handler function to upload a file
   const uploadFileHandler = async (e, forImages) => {
     const file = e.target.files[0];
     const bodyFormData = new FormData();
     bodyFormData.append('file', file);
     try {
-      dispatch({ type: 'UPLOAD_REQUEST' });
+      dispatch({ type: 'UPLOAD_REQUEST' }); // dispatching a request to upload a file
       const { data } = await axios.post('/api/upload', bodyFormData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           authorization: `Bearer ${userInfo.token}`,
         },
       });
-      dispatch({ type: 'UPLOAD_SUCCESS' });
+      dispatch({ type: 'UPLOAD_SUCCESS' }); // dispatching a successful upload
 
       if (forImages) {
+        // if the file is an image
         setImages([...images, data.secure_url]);
       } else {
+        // if the file is not an image
         setImage(data.secure_url);
       }
       toast.success('Image uploaded successfully. click Update to apply it');
     } catch (err) {
       toast.error(getError(err));
-      dispatch({ type: 'UPLOAD_FAIL', payload: getError(err) });
+      dispatch({ type: 'UPLOAD_FAIL', payload: getError(err) }); // dispatching a failed upload
     }
   };
+
+  // Handler function to delete a file
   const deleteFileHandler = async (fileName, f) => {
     console.log(fileName, f);
     console.log(images);
     console.log(images.filter((x) => x !== fileName));
-    setImages(images.filter((x) => x !== fileName));
+    setImages(images.filter((x) => x !== fileName)); // filtering out the deleted image
     toast.success('Image removed successfully. click Update to apply it');
   };
 
@@ -161,10 +174,13 @@ export default function ProductEditScreen() {
       <h1>Edit Product {productId}</h1>
 
       {loading ? (
+        // If 'loading' is true, display a LoadingBox component.
         <LoadingBox></LoadingBox>
       ) : error ? (
+        // If 'error' is not null, display a MessageBox component with an error variant and an error message.
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
+        // Otherwise, display a form to edit the product.
         <Form onSubmit={submitHandler}>
           <Form.Group className="mb-3" controlId="name">
             <Form.Label>Name</Form.Label>

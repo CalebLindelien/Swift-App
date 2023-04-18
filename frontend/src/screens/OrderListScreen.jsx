@@ -9,6 +9,7 @@ import MessageBox from '../components/MessageBox';
 import { Store } from '../Store';
 import { getError } from '../utils';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -39,6 +40,7 @@ const reducer = (state, action) => {
 };
 export default function OrderListScreen() {
   const navigate = useNavigate();
+  // retrieve user info from the global state
   const { state } = useContext(Store);
   const { userInfo } = state;
   const [{ loading, error, orders, loadingDelete, successDelete }, dispatch] =
@@ -47,6 +49,7 @@ export default function OrderListScreen() {
       error: '',
     });
 
+  // Fetching data when page loads or when successDelete changes
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -69,6 +72,7 @@ export default function OrderListScreen() {
     }
   }, [userInfo, successDelete]);
 
+  // Function to delete an order
   const deleteHandler = async (order) => {
     if (window.confirm('Are you sure to delete?')) {
       try {
@@ -87,6 +91,7 @@ export default function OrderListScreen() {
     }
   };
 
+  // render the component
   return (
     <div>
       <Helmet>
@@ -99,6 +104,7 @@ export default function OrderListScreen() {
       ) : error ? (
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
+        // Displays a list of orders
         <table className="table">
           <thead>
             <tr>

@@ -3,18 +3,22 @@ import expressAsyncHandler from 'express-async-handler';
 import Product from '../models/productModel.js';
 import { isAuth, isAdmin } from '../utils.js';
 
+// Create an instance of the Express router
 const productRouter = express.Router();
 
+// Get all products - USER access only
 productRouter.get('/', async (req, res) => {
   const products = await Product.find();
   res.send(products);
 });
 
+// Creating new product - ADMIN access only
 productRouter.post(
   '/',
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
+    // Create new product instance
     const newProduct = new Product({
       name: 'sample name ' + Date.now(),
       slug: 'sample-name-' + Date.now(),
@@ -27,18 +31,23 @@ productRouter.post(
       numReviews: 0,
       description: 'sample description',
     });
+    // Save the new product and send response with product info
     const product = await newProduct.save();
     res.send({ message: 'Product Created', product });
   })
 );
 
+// Updating product - ADMIN access only
 productRouter.put(
   '/:id',
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
+    // Get the product ID from the request parameter
     const productId = req.params.id;
+    // Find the product by ID in the database
     const product = await Product.findById(productId);
+    // If product exists, update its fields and save it
     if (product) {
       product.name = req.body.name;
       product.slug = req.body.slug;
@@ -57,12 +66,15 @@ productRouter.put(
   })
 );
 
+// Deleting product - ADMIN access only
 productRouter.delete(
   '/:id',
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
+    // Find the product by ID in the database
     const product = await Product.findById(req.params.id);
+    // If product exists, delete it
     if (product) {
       await product.deleteOne();
       res.send({ message: 'Product Deleted' });
@@ -72,12 +84,16 @@ productRouter.delete(
   })
 );
 
+// Get product details - USER access only
 productRouter.post(
   '/:id/reviews',
   isAuth,
   expressAsyncHandler(async (req, res) => {
+    // Get the product ID from the request parameter
     const productId = req.params.id;
+    // Find the product by ID in the database
     const product = await Product.findById(productId);
+    // If product exists, check if user already submitted a review
     if (product) {
       if (product.reviews.find((x) => x.name === req.user.name)) {
         return res
@@ -85,17 +101,22 @@ productRouter.post(
           .send({ message: 'You already submitted a review' });
       }
 
+      // Create a new review object
       const review = {
         name: req.user.name,
         rating: Number(req.body.rating),
         comment: req.body.comment,
       };
+      // Add the new review to the product
       product.reviews.push(review);
       product.numReviews = product.reviews.length;
       product.rating =
         product.reviews.reduce((a, c) => c.rating + a, 0) /
         product.reviews.length;
+
+      // Save the product with the new review
       const updatedProduct = await product.save();
+      // Send response with updated product info
       res.status(201).send({
         message: 'Review Created',
         review: updatedProduct.reviews[updatedProduct.reviews.length - 1],
@@ -110,6 +131,7 @@ productRouter.post(
 
 const PAGE_SIZE = 3;
 
+// Retrieve all products in the database, paginated and filtered as needed - ADMIN access only
 productRouter.get(
   '/admin',
   isAuth,
@@ -119,10 +141,13 @@ productRouter.get(
     const page = query.page || 1;
     const pageSize = query.pageSize || PAGE_SIZE;
 
+    // get products for the current page using pagination
     const products = await Product.find()
       .skip(pageSize * (page - 1))
       .limit(pageSize);
+    // get total number of products
     const countProducts = await Product.countDocuments();
+    // send response with products, count, and pagination info
     res.send({
       products,
       countProducts,
@@ -132,18 +157,21 @@ productRouter.get(
   })
 );
 
+// Retrieve all products based on query parameters, sorted and filtered as needed - USER access only
 productRouter.get(
   '/search',
   expressAsyncHandler(async (req, res) => {
     const { query } = req;
     const pageSize = query.pageSize || PAGE_SIZE;
     const page = query.page || 1;
+    // get optional search filters from query parameters
     const category = query.category || '';
     const price = query.price || '';
     const rating = query.rating || '';
     const order = query.order || '';
     const searchQuery = query.query || '';
 
+    // create filter objects for each search filter
     const queryFilter =
       searchQuery && searchQuery !== 'all'
         ? {
@@ -172,6 +200,7 @@ productRouter.get(
             },
           }
         : {};
+    // create sort order object based on query parameter
     const sortOrder =
       order === 'featured'
         ? { featured: -1 }
@@ -185,6 +214,7 @@ productRouter.get(
         ? { createdAt: -1 }
         : { _id: -1 };
 
+    // get products matching filters and sorted in the correct order
     const products = await Product.find({
       ...queryFilter,
       ...categoryFilter,
@@ -195,12 +225,14 @@ productRouter.get(
       .skip(pageSize * (page - 1))
       .limit(pageSize);
 
+    // get count of products matching filters
     const countProducts = await Product.countDocuments({
       ...queryFilter,
       ...categoryFilter,
       ...priceFilter,
       ...ratingFilter,
     });
+    // send response with products, count, and pagination info
     res.send({
       products,
       countProducts,
@@ -210,6 +242,7 @@ productRouter.get(
   })
 );
 
+// Retrieve all distinct categories of products in the database - USER access only
 productRouter.get(
   '/categories',
   expressAsyncHandler(async (req, res) => {
@@ -218,6 +251,7 @@ productRouter.get(
   })
 );
 
+// Retrieve a single product by its slug
 productRouter.get('/slug/:slug', async (req, res) => {
   const product = await Product.findOne({ slug: { $eq: req.params.slug } });
 
@@ -227,6 +261,8 @@ productRouter.get('/slug/:slug', async (req, res) => {
     res.status(404).send({ message: 'Product not found' });
   }
 });
+
+// Retrieve a single product by its ID
 productRouter.get('/:id', async (req, res) => {
   const product = await Product.findById(req.params.id);
   if (product) {

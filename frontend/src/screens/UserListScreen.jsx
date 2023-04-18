@@ -9,6 +9,7 @@ import MessageBox from '../components/MessageBox';
 import { Store } from '../Store';
 import { getError } from '../utils';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -39,15 +40,19 @@ const reducer = (state, action) => {
 };
 export default function UserListScreen() {
   const navigate = useNavigate();
+
+  // Use a reducer to manage state changes
   const [{ loading, error, users, loadingDelete, successDelete }, dispatch] =
     useReducer(reducer, {
       loading: true,
       error: '',
     });
 
+  // Get user info from the global state
   const { state } = useContext(Store);
   const { userInfo } = state;
 
+  // Fetch the list of users from the API when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -63,6 +68,7 @@ export default function UserListScreen() {
         });
       }
     };
+    // Reset the state after a successful delete, or fetch the list of users
     if (successDelete) {
       dispatch({ type: 'DELETE_RESET' });
     } else {
@@ -70,6 +76,7 @@ export default function UserListScreen() {
     }
   }, [userInfo, successDelete]);
 
+  // Delete a user from the list when the delete button is clicked
   const deleteHandler = async (user) => {
     if (window.confirm('Are you sure to delete?')) {
       try {
@@ -87,6 +94,8 @@ export default function UserListScreen() {
       }
     }
   };
+
+  // Render the screen
   return (
     <div>
       <Helmet>

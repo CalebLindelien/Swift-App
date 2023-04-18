@@ -15,6 +15,7 @@ import { Store } from '../Store';
 import { getError } from '../utils';
 import { toast } from 'react-toastify';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 function reducer(state, action) {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -48,14 +49,18 @@ function reducer(state, action) {
       return state;
   }
 }
+
 export default function OrderScreen() {
+  // retrieve user info from the global state
   const { state } = useContext(Store);
   const { userInfo } = state;
 
+  // Extract the orderId from the URL parameters
   const params = useParams();
   const { id: orderId } = params;
   const navigate = useNavigate();
 
+  // Use the useReducer hook to manage state and dispatch actions
   const [
     {
       loading,
@@ -75,8 +80,10 @@ export default function OrderScreen() {
     loadingPay: false,
   });
 
+  // Use the usePayPalScriptReducer hook to manage state related to PayPal script
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
+  // Function to create a PayPal order using the PayPal API
   function createOrder(data, actions) {
     return actions.order
       .create({
@@ -91,10 +98,14 @@ export default function OrderScreen() {
       });
   }
 
+  // Function to execute a PayPal payment once the customer approves the transaction
   function onApprove(data, actions) {
     return actions.order.capture().then(async function (details) {
       try {
+        // Dispatch PAY_REQUEST action to indicate that a payment request has been sent
         dispatch({ type: 'PAY_REQUEST' });
+
+        // Send a PUT request to the server to capture the payment
         const { data } = await axios.put(
           `/api/orders/${order._id}/pay`,
           details,
@@ -110,6 +121,8 @@ export default function OrderScreen() {
       }
     });
   }
+
+  // Function to handle errors in the PayPal payment flow
   function onError(err) {
     toast.error(getError(err));
   }
@@ -117,19 +130,24 @@ export default function OrderScreen() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
+        // Dispatch FETCH_REQUEST action to indicate that an order fetch request has been sent
         dispatch({ type: 'FETCH_REQUEST' });
         const { data } = await axios.get(`/api/orders/${orderId}`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
+        // Dispatch FETCH_SUCCESS action to update state with the fetched order data
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
       } catch (err) {
+        // Dispatch FETCH_FAIL action to update state with the error
         dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
       }
     };
 
+    // If user is not authenticated, redirect to login page
     if (!userInfo) {
       return navigate('/login');
     }
+    // If there is no order or if payment/delivery has been successful or if the order ID has changed, fetch the order again
     if (
       !order._id ||
       successPay ||
@@ -137,14 +155,17 @@ export default function OrderScreen() {
       (order._id && order._id !== orderId)
     ) {
       fetchOrder();
+      // Reset the PAY_SUCCESS action in the state
       if (successPay) {
         dispatch({ type: 'PAY_RESET' });
       }
       if (successDeliver) {
+        // Reset the DELIVER_SUCCESS action in the state
         dispatch({ type: 'DELIVER_RESET' });
       }
     } else {
       const loadPaypalScript = async () => {
+        // Load the PayPal script and set options
         const { data: clientId } = await axios.get('/api/keys/paypal', {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
@@ -169,6 +190,7 @@ export default function OrderScreen() {
     successDeliver,
   ]);
 
+  // Function to handle delivery of the order
   async function deliverOrderHandler() {
     try {
       dispatch({ type: 'DELIVER_REQUEST' });
@@ -186,6 +208,8 @@ export default function OrderScreen() {
       dispatch({ type: 'DELIVER_FAIL' });
     }
   }
+
+  // Render loading, error, or order information
   return loading ? (
     <LoadingBox></LoadingBox>
   ) : error ? (
@@ -198,6 +222,7 @@ export default function OrderScreen() {
       <h1 className="my-3">Order {orderId}</h1>
       <Row>
         <Col md={8}>
+          {/* Display shipping information */}
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Shipping</Card.Title>
@@ -208,14 +233,17 @@ export default function OrderScreen() {
                 ,{order.shippingAddress.country}
               </Card.Text>
               {order.isDelivered ? (
+                // Show delivered message if order has been delivered
                 <MessageBox variant="success">
                   Delivered at {order.deliveredAt}
                 </MessageBox>
               ) : (
+                // Show not delivered message if order has not been delivered
                 <MessageBox variant="danger">Not Delivered</MessageBox>
               )}
             </Card.Body>
           </Card>
+          {/* Display payment information */}
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Payment</Card.Title>
@@ -223,15 +251,18 @@ export default function OrderScreen() {
                 <strong>Method:</strong> {order.paymentMethod}
               </Card.Text>
               {order.isPaid ? (
+                // Show paid message if order has been paid
                 <MessageBox variant="success">
                   Paid at {order.paidAt}
                 </MessageBox>
               ) : (
+                // Show not paid message if order has not been paid
                 <MessageBox variant="danger">Not Paid</MessageBox>
               )}
             </Card.Body>
           </Card>
 
+          {/* Display order items */}
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Items</Card.Title>

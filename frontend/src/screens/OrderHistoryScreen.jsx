@@ -8,6 +8,7 @@ import { Store } from '../Store';
 import { getError } from '../utils';
 import Button from 'react-bootstrap/Button';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -22,14 +23,18 @@ const reducer = (state, action) => {
 };
 
 export default function OrderHistoryScreen() {
+  // retrieve user info from the global state
   const { state } = useContext(Store);
   const { userInfo } = state;
   const navigate = useNavigate();
 
+  // define the state using the reducer function
   const [{ loading, error, orders }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
   });
+
+  // fetch the user's order history on component mount
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
@@ -49,6 +54,8 @@ export default function OrderHistoryScreen() {
     };
     fetchData();
   }, [userInfo]);
+
+  // render the component
   return (
     <div>
       <Helmet>
@@ -61,6 +68,7 @@ export default function OrderHistoryScreen() {
       ) : error ? (
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
+        // Render order history table
         <table className="table">
           <thead>
             <tr>
@@ -85,6 +93,7 @@ export default function OrderHistoryScreen() {
                     : 'No'}
                 </td>
                 <td>
+                  {/* render a button to navigate to the order details screen */}
                   <Button
                     type="button"
                     variant="light"

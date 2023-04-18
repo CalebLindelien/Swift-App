@@ -5,8 +5,10 @@ import User from '../models/userModel.js';
 import Product from '../models/productModel.js';
 import { isAuth, isAdmin } from '../utils.js';
 
+// Create an instance of the Express router
 const orderRouter = express.Router();
 
+// Get all orders - ADMIN access only
 orderRouter.get(
   '/',
   isAuth,
@@ -17,6 +19,7 @@ orderRouter.get(
   })
 );
 
+// Create a new order - USER access only
 orderRouter.post(
   '/',
   isAuth,
@@ -37,6 +40,7 @@ orderRouter.post(
   })
 );
 
+// Get order summary - ADMIN access only
 orderRouter.get(
   '/summary',
   isAuth,
@@ -81,6 +85,7 @@ orderRouter.get(
   })
 );
 
+// Get logged-in user's orders - USER access only
 orderRouter.get(
   '/mine',
   isAuth,
@@ -90,6 +95,7 @@ orderRouter.get(
   })
 );
 
+// Get order by ID - USER access only
 orderRouter.get(
   '/:id',
   isAuth,
@@ -103,6 +109,7 @@ orderRouter.get(
   })
 );
 
+// Update order status to "Delivered" - USER access only
 orderRouter.put(
   '/:id/deliver',
   isAuth,
@@ -119,6 +126,7 @@ orderRouter.put(
   })
 );
 
+// Update order status to "Paid" - USER access only
 orderRouter.put(
   '/:id/pay',
   isAuth,
@@ -142,6 +150,7 @@ orderRouter.put(
   })
 );
 
+// Delete order - ADMIN access only
 orderRouter.delete(
   '/:id',
   isAuth,

@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 
+// create a new mongoose schema for the order collection in the database
 const orderSchema = new mongoose.Schema(
   {
+    // array of objects that contains order items and their details
     orderItems: [
       {
         slug: { type: String, required: true },
@@ -9,6 +11,7 @@ const orderSchema = new mongoose.Schema(
         quantity: { type: Number, required: true },
         image: { type: String, required: true },
         price: { type: Number, required: true },
+        // reference to the Product model
         product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Product',
@@ -16,6 +19,7 @@ const orderSchema = new mongoose.Schema(
         },
       },
     ],
+    // shipping address information for the order
     shippingAddress: {
       fullName: { type: String, required: true },
       address: { type: String, required: true },
@@ -23,7 +27,9 @@ const orderSchema = new mongoose.Schema(
       postalCode: { type: String, required: true },
       country: { type: String, required: true },
     },
+    // payment method used for the order
     paymentMethod: { type: String, required: true },
+    // payment result object containing payment details
     paymentResult: {
       id: String,
       status: String,
@@ -40,10 +46,13 @@ const orderSchema = new mongoose.Schema(
     isDelivered: { type: Boolean, default: false },
     deliveredAt: { type: Date },
   },
+  // add timestamps for created at and updated at fields
   {
     timestamps: true,
   }
 );
 
+// create an Order model based on the order schema
 const Order = mongoose.model('Order', orderSchema);
+
 export default Order;

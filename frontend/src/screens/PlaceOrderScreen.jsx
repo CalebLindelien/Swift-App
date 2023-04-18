@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import { getError } from '../utils';
 import LoadingBox from '../components/LoadingBox';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 const reducer = (state, action) => {
   switch (action.type) {
     case 'CREATE_REQUEST':
@@ -29,13 +30,16 @@ const reducer = (state, action) => {
 export default function PlaceOrderScreen() {
   const navigate = useNavigate();
 
+  // Initializes the loading state
   const [{ loading }, dispatch] = useReducer(reducer, {
     loading: false,
   });
 
+  // Get the cart and userInfo from the store
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
 
+  // Calculates the cart prices (items, shipping, tax, and total)
   const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100; // 123.2345 => 123.23
   cart.itemsPrice = round2(
     cart.cartItems.reduce((acc, curr) => acc + curr.quantity * curr.price, 0)
@@ -44,6 +48,7 @@ export default function PlaceOrderScreen() {
   cart.taxPrice = round2(0.15 * cart.itemsPrice);
   cart.totalPrice = cart.itemsPrice + cart.shippingPrice + cart.taxPrice;
 
+  // Sends the order to the server and navigates to the order details page
   const placeOrderHandler = async () => {
     try {
       dispatch({ type: 'CREATE_REQUEST' });
@@ -75,14 +80,17 @@ export default function PlaceOrderScreen() {
     }
   };
 
+  // Redirects to the payment page if the payment method is not set
   useEffect(() => {
     if (!cart.paymentMethod) {
       navigate('/payment');
     }
   }, [cart, navigate]);
 
+  // Renders PlaceOrderScreen
   return (
     <div>
+      {/* Checkout Steps Component */}
       <CheckoutSteps step1 step2 step3 step4></CheckoutSteps>
       <Helmet>
         <title>Preview Order</title>
@@ -90,6 +98,7 @@ export default function PlaceOrderScreen() {
       <h1 className="my-3">Preview Order</h1>
       <Row>
         <Col md={8}>
+          {/* Shipping Card */}
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Shipping</Card.Title>
@@ -102,6 +111,7 @@ export default function PlaceOrderScreen() {
               <Link to="/shipping">Edit</Link>
             </Card.Body>
           </Card>
+          {/* Payment Card */}
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Payment</Card.Title>
@@ -140,6 +150,7 @@ export default function PlaceOrderScreen() {
             </Card.Body>
           </Card>
         </Col>
+        {/* Order Summary Card */}
         <Col md={4}>
           <Card>
             <Card.Body>

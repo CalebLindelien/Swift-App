@@ -9,11 +9,13 @@ import CheckoutSteps from '../components/CheckoutSteps';
 export default function ShippingAddressScreen() {
   const navigate = useNavigate();
   const { state, dispatch: ctxDispatch } = useContext(Store);
-
+  // Extract relevant state
   const {
     userInfo,
     cart: { shippingAddress },
   } = state;
+
+  // Set up state for form inputs, prefilling them with saved shipping address if available
   const [fullName, setFullName] = useState(shippingAddress.fullName || '');
   const [address, setAddress] = useState(shippingAddress.address || '');
   const [city, setCity] = useState(shippingAddress.city || '');
@@ -21,11 +23,15 @@ export default function ShippingAddressScreen() {
     shippingAddress.postalCode || ''
   );
   const [country, setCountry] = useState(shippingAddress.country || '');
+
+  // Redirect to sign-in if user is not logged in
   useEffect(() => {
     if (!userInfo) {
       navigate('/signin?redirect=/shipping');
     }
   }, [userInfo, navigate]);
+
+  // Submit handler for form, saves shipping address and navigates to payment screen
   const submitHandler = (e) => {
     e.preventDefault();
     ctxDispatch({
@@ -38,6 +44,8 @@ export default function ShippingAddressScreen() {
     );
     navigate('/payment');
   };
+
+  // Render the screen
   return (
     <div>
       <Helmet>

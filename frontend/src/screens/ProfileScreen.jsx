@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { getError } from '../utils';
 import axios from 'axios';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 const reducer = (state, action) => {
   switch (action.type) {
     case 'UPDATE_REQUEST':
@@ -22,20 +23,26 @@ const reducer = (state, action) => {
 };
 
 export default function ProfileScreen() {
+  // Use the useContext hook to get the userInfo object from the global state
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
+
+  // Use the useState hook to store the user's name, email, password, and confirmPassword
   const [name, setName] = useState(userInfo.name);
   const [email, setEmail] = useState(userInfo.email);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Use the useReducer hook to manage the loadingUpdate state
   const [{ loadingUpdate }, dispatch] = useReducer(reducer, {
     loadingUpdate: false,
   });
 
+  // Define the submitHandler function to handle form submissions
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
+      // Send a PUT request to update the user's profile
       const { data } = await axios.put(
         '/api/users/profile',
         {
@@ -47,10 +54,12 @@ export default function ProfileScreen() {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         }
       );
+      // Dispatch UPDATE_SUCCESS action to update loadingUpdate state
       dispatch({
         type: 'UPDATE_SUCCESS',
       });
       ctxDispatch({ type: 'USER_SIGNIN', payload: data });
+      // Store the updated user info in local storage
       localStorage.setItem('userInfo', JSON.stringify(data));
       toast.success('User updated successfully');
     } catch (err) {
@@ -61,6 +70,7 @@ export default function ProfileScreen() {
     }
   };
 
+  // Render the ProfileScreen component
   return (
     <div className="container small-container">
       <Helmet>

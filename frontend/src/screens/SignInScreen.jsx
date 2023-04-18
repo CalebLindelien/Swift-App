@@ -15,11 +15,15 @@ export default function SigninScreen() {
   const redirectInUrl = new URLSearchParams(search).get('redirect');
   const redirect = redirectInUrl ? redirectInUrl : '/';
 
+  // Initializing state for email and password
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Getting user info from global state using context
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
+
+  // Handling form submission
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
@@ -35,12 +39,14 @@ export default function SigninScreen() {
     }
   };
 
+  // Checking if user is already logged in
   useEffect(() => {
     if (userInfo) {
       navigate(redirect);
     }
   }, [navigate, redirect, userInfo]);
 
+  // Rendering the signin form
   return (
     <Container className="small-container">
       <Helmet>

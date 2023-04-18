@@ -10,6 +10,7 @@ import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
 import { getError } from '../utils';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -53,6 +54,7 @@ const reducer = (state, action) => {
 };
 
 export default function ProductListScreen() {
+  // Initialize the state of the component using useReducer hook
   const [
     {
       loading,
@@ -74,20 +76,28 @@ export default function ProductListScreen() {
   const sp = new URLSearchParams(search);
   const page = sp.get('page') || 1;
 
+  // Extract user information from the global store using useContext hook
   const { state } = useContext(Store);
   const { userInfo } = state;
 
+  // useEffect hook to fetch the data and re-render the component whenever one of the dependency changes
   useEffect(() => {
+    // Fetch data from server
     const fetchData = async () => {
       try {
         const { data } = await axios.get(`/api/products/admin?page=${page} `, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
 
+        // Dispatch the action to update state
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
-      } catch (err) {}
+      } catch (err) {
+        // Dispatch the action to update error state
+        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+      }
     };
 
+    // Check if product is deleted
     if (successDelete) {
       dispatch({ type: 'DELETE_RESET' });
     } else {
@@ -95,10 +105,14 @@ export default function ProductListScreen() {
     }
   }, [page, userInfo, successDelete]);
 
+  // Event handler for create product button click
   const createHandler = async () => {
     if (window.confirm('Are you sure to create?')) {
       try {
         dispatch({ type: 'CREATE_REQUEST' });
+        // Send a POST request to the '/api/products' endpoint to create a new product
+        // with an empty object as the request body and the user's authentication token
+        // included in the request headers
         const { data } = await axios.post(
           '/api/products',
           {},
@@ -118,9 +132,12 @@ export default function ProductListScreen() {
     }
   };
 
+  // Event handler for delete product button click
   const deleteHandler = async (product) => {
     if (window.confirm('Are you sure to delete?')) {
       try {
+        // Send a DELETE request to the '/api/products/:id' endpoint to delete the specified
+        // product, with the user's authentication token included in the request headers
         await axios.delete(`/api/products/${product._id}`, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
@@ -135,6 +152,7 @@ export default function ProductListScreen() {
     }
   };
 
+  // Render the products page
   return (
     <div>
       <Row>
@@ -150,7 +168,9 @@ export default function ProductListScreen() {
         </Col>
       </Row>
 
+      {/* If a create request is in progress, show a loading spinner */}
       {loadingCreate && <LoadingBox></LoadingBox>}
+      {/* If a delete request is in progress, show a loading spinner */}
       {loadingDelete && <LoadingBox></LoadingBox>}
 
       {loading ? (
@@ -159,6 +179,7 @@ export default function ProductListScreen() {
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
         <>
+          {/* Otherwise, render the table of products */}
           <table className="table">
             <thead>
               <tr>

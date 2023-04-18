@@ -4,8 +4,10 @@ import expressAsyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import { isAuth, isAdmin, generateToken } from '../utils.js';
 
+// Create an instance of the Express router
 const userRouter = express.Router();
 
+// Route to get all users - ADMIN access only
 userRouter.get(
   '/',
   isAuth,
@@ -16,6 +18,7 @@ userRouter.get(
   })
 );
 
+// Route to get user by ID - ADMIN access only
 userRouter.get(
   '/:id',
   isAuth,
@@ -30,6 +33,7 @@ userRouter.get(
   })
 );
 
+// Route to update a user's profile - USER access only
 userRouter.put(
   '/profile',
   isAuth,
@@ -56,6 +60,7 @@ userRouter.put(
   })
 );
 
+// Route to update a user by id - ADMIN access only
 userRouter.put(
   '/:id',
   isAuth,
@@ -74,6 +79,7 @@ userRouter.put(
   })
 );
 
+// Route to delete a user by id - ADMIN access only
 userRouter.delete(
   '/:id',
   isAuth,
@@ -93,6 +99,7 @@ userRouter.delete(
   })
 );
 
+// Route to sign in a user
 userRouter.post(
   '/signin',
   expressAsyncHandler(async (req, res) => {
@@ -113,6 +120,7 @@ userRouter.post(
   })
 );
 
+// Route to register a new user
 userRouter.post(
   '/signup',
   expressAsyncHandler(async (req, res) => {

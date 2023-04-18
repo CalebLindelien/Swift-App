@@ -11,6 +11,7 @@ import MessageBox from '../components/MessageBox';
 import { Store } from '../Store';
 import { getError } from '../utils';
 
+// Defining a reducer function that handles the state changes based on the actions dispatched to it
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -36,17 +37,20 @@ export default function UserEditScreen() {
     error: '',
   });
 
+  // Getting user info from global state
   const { state } = useContext(Store);
   const { userInfo } = state;
 
   const params = useParams();
-  const { id: userId } = params;
+  const { id: userId } = params; // Extracting the user ID from the URL
   const navigate = useNavigate();
 
+  // Initializing states
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Fetching the user data from the server
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -68,6 +72,7 @@ export default function UserEditScreen() {
     fetchData();
   }, [userId, userInfo]);
 
+  // A function for handling form submissions
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
@@ -89,6 +94,8 @@ export default function UserEditScreen() {
       dispatch({ type: 'UPDATE_FAIL' });
     }
   };
+
+  // Render the screen
   return (
     <Container className="small-container">
       <Helmet>

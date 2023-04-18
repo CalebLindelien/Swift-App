@@ -10,18 +10,23 @@ import { toast } from 'react-toastify';
 import { getError } from '../utils';
 
 function SignupScreen() {
+  // Initializing variables
   const navigate = useNavigate();
   const { search } = useLocation();
   const redirectInUrl = new URLSearchParams(search).get('redirect');
   const redirect = redirectInUrl ? redirectInUrl : '/';
 
+  // Initializing states
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // retrieve user info from the global state
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
+
+  // Function to handle form submission
   const submitHandler = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
@@ -42,12 +47,14 @@ function SignupScreen() {
     }
   };
 
+  // Effect to redirect to home page after successful sign up
   useEffect(() => {
     if (userInfo) {
       navigate(redirect);
     }
   }, [navigate, redirect, userInfo]);
 
+  // Render the screen
   return (
     <Container className="small-container">
       <Helmet>
