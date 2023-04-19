@@ -98,5 +98,5 @@ To run this project, you will need to add the following environment variables to
 2. After the last step, copy your MongoDB link address and replace the `.env` file `MONGO_URL` field, please replace `<password>` with the correct password you set.
 3. Then set your own `JWT_SECRET` String.
 4. Then set `PORT=3001`.
-5. Then set up a PAYPAL_CLIENT_ID with [PayPal](https://developer.paypal.com/).
-6. Lastly set up the three [cloudinary](https://cloudinary.com) variables (Cloud Name), (API Key), (API Secret)
+5. Then set up a `PAYPAL_CLIENT_ID` with [PayPal](https://developer.paypal.com/).
+6. Lastly set up the three [cloudinary](https://cloudinary.com) variables `Cloud Name`, `API Key`, `API Secret`
