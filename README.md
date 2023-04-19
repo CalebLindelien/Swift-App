@@ -6,14 +6,27 @@ This is Swift a MERN stack Ecommerce Store
 
 ## Tech Stack
 
-**Client:** React, Redux, React Router, Axios
+**Client:** React, Redux, React Router
 
 **Server:** Node, Express, Mongoose, JSON Web token, Multer
 
 
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+Home Page
+<img width="1422" alt="HomePage" src="https://github.com/CalebLindelien/Swift-App/blob/main/frontend/public/images/HomeView.png">
+___
+Filter Ability
+<img width="1422" alt="ProductFilter" src="https://github.com/CalebLindelien/Swift-App/blob/main/frontend/public/images/FilterView.png">
+___
+Connected With PayPal
+<img width="1422" alt="PayPalCart" src="https://github.com/CalebLindelien/Swift-App/blob/main/frontend/public/images/CartWithPayPal.png">
+___
+Admin Dashboard
+<img width="1422" alt="AdminDashboard" src="https://github.com/CalebLindelien/Swift-App/blob/main/frontend/public/images/AdminDashboard.png">
+___
+Mobile View
+<img width="332" alt="MobileView" src="https://github.com/CalebLindelien/Swift-App/blob/main/frontend/public/images/MobileView.png">
 
 
 ## Run Locally
